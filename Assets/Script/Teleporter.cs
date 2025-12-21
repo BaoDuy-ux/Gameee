@@ -14,8 +14,8 @@ public class Teleporter : MonoBehaviour
     {
         if (playerInRange && requireInteract)
         {
-            // Kiểm tra Input System hoặc Input.GetKeyDown
-            if (Input.GetKeyDown(KeyCode.E) || Input.GetButtonDown("Interact"))
+            // Kiểm tra Input
+            if (Input.GetKeyDown(KeyCode.E))
             {
                 Teleport();
             }
