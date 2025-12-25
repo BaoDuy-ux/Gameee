@@ -3,16 +3,6 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
 
-// Custom certificate handler to allow insecure HTTP connections
-public class BypassCertificateHandler : CertificateHandler
-{
-    protected override bool ValidateCertificate(byte[] certificateData)
-    {
-        // Always return true to allow all certificates (for local development)
-        return true;
-    }
-}
-
 [System.Serializable]
 public class RegisterData
 {
@@ -42,6 +32,12 @@ public class TcpClientManager : MonoBehaviour
     // Event để UI có thể lắng nghe kết quả
     public System.Action<string, bool> OnRegisterResult; // message, success
     public System.Action<string, int?> OnLoginResult; // message, userId (null nếu lỗi)
+
+    void Awake()
+    {
+        // Allow insecure HTTP connections for local development
+        UnityWebRequest.InsecureHttpOption = InsecureHttpOption.AlwaysAllowed;
+    }
 
     public void RegisterAccount(string email, string password)
     {
@@ -166,9 +162,24 @@ public class TcpClientManager : MonoBehaviour
                 if (apiResponse.status == "success")
                 {
                     Debug.Log("✅ Đăng nhập thành công! UserID: " + apiResponse.userId);
-                    // Lưu userId để dùng sau
+                    // Lưu userId và username để dùng sau
                     PlayerPrefs.SetInt("UserId", apiResponse.userId);
+                    // Lấy username từ email (phần trước @)
+                    string userEmail = data.email;
+                    string username = userEmail.Split('@')[0];
+                    PlayerPrefs.SetString("Username", username);
                     PlayerPrefs.Save();
+                    
+                    Debug.Log($"✅✅✅ Đã lưu vào PlayerPrefs: UserId={PlayerPrefs.GetInt("UserId")}, Username={PlayerPrefs.GetString("Username")}");
+                    Debug.Log($"✅ Kiểm tra lại: HasKey('UserId')={PlayerPrefs.HasKey("UserId")}");
+                    
+                    // Set user info cho SignalRManager
+                    SignalRManager signalR = FindFirstObjectByType<SignalRManager>();
+                    if (signalR != null)
+                    {
+                        signalR.SetUserInfo(apiResponse.userId, username);
+                    }
+                    
                     OnLoginResult?.Invoke(apiResponse.message, apiResponse.userId);
                 }
                 else
@@ -180,16 +191,27 @@ public class TcpClientManager : MonoBehaviour
             catch (System.Exception ex)
             {
                 Debug.LogError("Lỗi parse JSON: " + ex.Message);
+                OnLoginResult?.Invoke("Lỗi xử lý phản hồi từ server", null);
             }
         }
         else
         {
+            string errorMsg = "Lỗi kết nối server";
+            if (!string.IsNullOrEmpty(request.downloadHandler.text))
+            {
+                try
+                {
+                    ApiResponse errorResponse = JsonUtility.FromJson<ApiResponse>(request.downloadHandler.text);
+                    errorMsg = errorResponse.message;
+                }
+                catch { }
+            }
             Debug.LogError("❌ Lỗi: " + request.error);
             Debug.LogError("Response Code: " + request.responseCode);
             Debug.LogError("Response Body: " + request.downloadHandler.text);
+            OnLoginResult?.Invoke(errorMsg, null);
         }
         
         request.Dispose();
     }
 }
-
