@@ -33,12 +33,6 @@ public class TcpClientManager : MonoBehaviour
     public System.Action<string, bool> OnRegisterResult; // message, success
     public System.Action<string, int?> OnLoginResult; // message, userId (null nếu lỗi)
 
-    void Awake()
-    {
-        // Allow insecure HTTP connections for local development
-        UnityWebRequest.InsecureHttpOption = InsecureHttpOption.AlwaysAllowed;
-    }
-
     public void RegisterAccount(string email, string password)
     {
         StartCoroutine(RegisterCoroutine(email, password));
