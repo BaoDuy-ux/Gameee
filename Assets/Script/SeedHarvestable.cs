@@ -45,6 +45,10 @@ public class SeedHarvestable : MonoBehaviour
 
     private void Update()
     {
+        // Không cho phép thu hoạch khi đang chat
+        if (ChatUI.IsChatting)
+            return;
+        
         // Kiểm tra input khi player trong vùng
         if (playerInRange && CanHarvest())
         {

@@ -50,6 +50,16 @@ public class Player : MonoBehaviour
 
     void MovePlayer() 
     {
+        // Không cho phép di chuyển khi đang chat
+        if (ChatUI.IsChatting)
+        {
+            rb.linearVelocity = Vector2.zero;
+            if (animator != null && HasParameter(animator, "IsRun"))
+            {
+                animator.SetBool("IsRun", false);
+            }
+            return;
+        }
       
         Vector2 playerInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 

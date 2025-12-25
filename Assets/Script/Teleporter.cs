@@ -12,6 +12,10 @@ public class Teleporter : MonoBehaviour
 
     void Update()
     {
+        // Không cho phép teleport khi đang chat
+        if (ChatUI.IsChatting)
+            return;
+        
         if (playerInRange && requireInteract)
         {
             // Kiểm tra Input

@@ -54,6 +54,10 @@ public class PlantableSpot : MonoBehaviour
                 highlightRenderer.color = Color.Lerp(originalColor, highlightColor, 0.5f);
             }
 
+            // Không cho phép tương tác khi đang chat
+            if (ChatUI.IsChatting)
+                return;
+            
             // Kiểm tra input để trồng cây
             if (Input.GetKeyDown(KeyCode.E))
             {

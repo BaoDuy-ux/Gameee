@@ -71,6 +71,10 @@ public class InventoryUI : MonoBehaviour
 
     private void Update()
     {
+        // Không cho phép mở inventory khi đang chat
+        if (ChatUI.IsChatting)
+            return;
+        
         // Toggle inventory khi nhấn phím
         // Thử cả phím I và kiểm tra bằng nhiều cách
         if (Input.GetKeyDown(KeyCode.I) || Input.GetKeyDown(toggleKey))

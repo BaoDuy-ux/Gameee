@@ -15,9 +15,14 @@ public class ChatUI : MonoBehaviour
     public GameObject chatMessagePrefab; // Prefab cho mỗi tin nhắn (có thể tạo đơn giản)
     public TextMeshProUGUI onlineUsersText;
     public Button toggleChatButton; // Nút để mở/đóng chat
+    public Button clearChatButton; // Nút để xóa tất cả tin nhắn
     
     [Header("Settings")]
     public float refreshInterval = 2f; // Refresh chat mỗi 2 giây
+    public KeyCode clearChatKey = KeyCode.Delete; // Phím để xóa chat (mặc định: Delete)
+    
+    // Static flag để các script khác biết khi đang chat (để disable movement/actions)
+    public static bool IsChatting { get; private set; } = false;
     
     private SignalRManager signalRManager;
     private int currentUserId = 0;
@@ -111,6 +116,20 @@ public class ChatUI : MonoBehaviour
             toggleChatButton.onClick.AddListener(ToggleChatPanel);
         }
         
+        // Setup clear chat button
+        if (clearChatButton != null)
+        {
+            clearChatButton.onClick.RemoveAllListeners();
+            clearChatButton.onClick.AddListener(ClearAllChatMessages);
+        }
+        
+        // Setup input field focus events để biết khi đang chat
+        if (chatInputField != null)
+        {
+            chatInputField.onSelect.AddListener(OnChatInputSelected);
+            chatInputField.onDeselect.AddListener(OnChatInputDeselected);
+        }
+        
         // Ẩn chat panel mặc định
         if (chatPanel != null)
         {
@@ -173,8 +192,24 @@ public class ChatUI : MonoBehaviour
         return keys.ToArray();
     }
     
+    void Update()
+    {
+        // Kiểm tra phím tắt để xóa chat (Delete hoặc Ctrl+L)
+        if (Input.GetKeyDown(clearChatKey) || (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.L)))
+        {
+            // Chỉ xóa khi chat panel đang mở
+            if (chatPanel != null && chatPanel.activeSelf)
+            {
+                ClearAllChatMessages();
+            }
+        }
+    }
+    
     void OnDestroy()
     {
+        // Reset IsChatting flag khi destroy
+        IsChatting = false;
+        
         if (signalRManager != null)
         {
             signalRManager.OnOnlineUsersUpdated -= UpdateOnlineUsers;
@@ -188,6 +223,17 @@ public class ChatUI : MonoBehaviour
         if (toggleChatButton != null)
         {
             toggleChatButton.onClick.RemoveAllListeners();
+        }
+        
+        if (clearChatButton != null)
+        {
+            clearChatButton.onClick.RemoveAllListeners();
+        }
+        
+        if (chatInputField != null)
+        {
+            chatInputField.onSelect.RemoveAllListeners();
+            chatInputField.onDeselect.RemoveAllListeners();
         }
     }
     
@@ -207,11 +253,49 @@ public class ChatUI : MonoBehaviour
             {
                 chatInputField.ActivateInputField();
             }
+            else if (!newState)
+            {
+                // Nếu đóng panel, reset IsChatting flag
+                IsChatting = false;
+            }
         }
         else
         {
             Debug.LogError("❌ ChatPanel is null! Không thể toggle!");
         }
+    }
+    
+    // Khi input field được chọn (focus)
+    void OnChatInputSelected(string text)
+    {
+        IsChatting = true;
+        Debug.Log("[ChatUI] Input field selected - IsChatting = true");
+    }
+    
+    // Khi input field mất focus
+    void OnChatInputDeselected(string text)
+    {
+        IsChatting = false;
+        Debug.Log("[ChatUI] Input field deselected - IsChatting = false");
+    }
+    
+    // Xóa tất cả tin nhắn trong chat
+    public void ClearAllChatMessages()
+    {
+        if (chatContent == null)
+            return;
+        
+        // Xóa tất cả child objects (tin nhắn) trong UI
+        for (int i = chatContent.childCount - 1; i >= 0; i--)
+        {
+            Destroy(chatContent.GetChild(i).gameObject);
+        }
+        
+        // KHÔNG clear displayedMessageIds và lastMessageId
+        // Để tránh hiển thị lại tin nhắn cũ từ server
+        // Chỉ xóa UI, giữ lại tracking để chỉ hiển thị tin nhắn mới
+        
+        Debug.Log("[ChatUI] Đã xóa tất cả tin nhắn (UI only, sẽ không hiển thị lại tin nhắn cũ)");
     }
     
     // Gửi tin nhắn
