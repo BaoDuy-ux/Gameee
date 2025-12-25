@@ -15,6 +15,30 @@ public class RegisterUI : MonoBehaviour
     [Header("Network Manager Reference")]
     public TcpClientManager tcpManager;
 
+    void Start()
+    {
+        // Tìm TcpClientManager nếu chưa gán
+        if (tcpManager == null)
+        {
+            tcpManager = FindObjectOfType<TcpClientManager>();
+        }
+        
+        // Đăng ký lắng nghe kết quả đăng ký
+        if (tcpManager != null)
+        {
+            tcpManager.OnRegisterResult += HandleRegisterResult;
+        }
+    }
+
+    void OnDestroy()
+    {
+        // Hủy đăng ký khi object bị destroy
+        if (tcpManager != null)
+        {
+            tcpManager.OnRegisterResult -= HandleRegisterResult;
+        }
+    }
+
     public void OnRegisterButtonClick()
     {
         string email = emailField.text.Trim();
@@ -28,6 +52,20 @@ public class RegisterUI : MonoBehaviour
             return;
         }
 
+        // Kiểm tra định dạng email
+        if (!IsValidEmail(email))
+        {
+            ShowMessage("Email không hợp lệ! Vui lòng nhập đúng định dạng email (ví dụ: user@gmail.com)");
+            return;
+        }
+
+        // Kiểm tra độ dài password
+        if (password.Length < 6)
+        {
+            ShowMessage("Mật khẩu phải có ít nhất 6 ký tự!");
+            return;
+        }
+
         // Kiểm tra xác nhận mật khẩu
         if (password != confirm)
         {
@@ -38,7 +76,7 @@ public class RegisterUI : MonoBehaviour
         // Nếu chưa gán tcpManager trong Unity, thì tự tìm
         if (tcpManager == null)
         {
-            tcpManager = FindObjectOfType<TcpClientManager>();
+            tcpManager = FindFirstObjectByType<TcpClientManager>();
         }
 
         if (tcpManager != null)
@@ -49,6 +87,33 @@ public class RegisterUI : MonoBehaviour
         else
         {
             ShowMessage("❌ Không tìm thấy TcpClientManager trong scene!");
+        }
+    }
+
+    // Kiểm tra email hợp lệ
+    private bool IsValidEmail(string email)
+    {
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    // Xử lý kết quả đăng ký
+    private void HandleRegisterResult(string message, bool success)
+    {
+        if (success)
+        {
+            ShowMessage("✅ " + message);
+        }
+        else
+        {
+            ShowMessage("❌ " + message);
         }
     }
 

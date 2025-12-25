@@ -26,10 +26,43 @@ public class LoginUI : MonoBehaviour
             Debug.LogWarning("Vui lòng nhập đầy đủ email và mật khẩu!");
             return;
         }
+        
+        // Đăng ký event để đợi login hoàn thành
+        if (tcpClientManager != null)
+        {
+            tcpClientManager.OnLoginResult += OnLoginComplete;
+            tcpClientManager.LoginAccount(email, password);
+        }
+    }
+    
+    void OnLoginComplete(string message, int? userId)
+    {
+        // Hủy đăng ký event
+        if (tcpClientManager != null)
+        {
+            tcpClientManager.OnLoginResult -= OnLoginComplete;
+        }
+        
+        if (userId.HasValue)
+        {
+            Debug.Log($"✅ Login hoàn thành! UserId: {userId.Value}");
+            Debug.Log($"✅ Kiểm tra PlayerPrefs: HasKey('UserId')={PlayerPrefs.HasKey("UserId")}");
+            
+            // Đợi một chút để đảm bảo PlayerPrefs được lưu
+            StartCoroutine(WaitAndLoadScene());
+        }
         else
         {
-            SceneManager.LoadScene("selectcharacter");
+            Debug.LogError($"❌ Login thất bại: {message}");
         }
-        tcpClientManager.LoginAccount(email, password);
+    }
+    
+    System.Collections.IEnumerator WaitAndLoadScene()
+    {
+        // Đợi 0.5 giây để đảm bảo PlayerPrefs được lưu
+        yield return new WaitForSeconds(0.5f);
+        
+        Debug.Log($"✅ Trước khi chuyển scene: HasKey('UserId')={PlayerPrefs.HasKey("UserId")}");
+        SceneManager.LoadScene("selectcharacter");
     }
 }

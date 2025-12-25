@@ -8,17 +8,39 @@ public class Player : MonoBehaviour
     private SpriteRenderer spriteRenderer;        
     private Animator animator;
 
+    private PlayerSaveManager saveManager;
+
     private void Awake() 
     {
         rb = GetComponent<Rigidbody2D>();      
         spriteRenderer = GetComponent<SpriteRenderer>(); 
         animator = GetComponent<Animator>();
     }
-
+    
     void Start()
     {
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
+        
+        // Tạo PlayerSaveManager trên GameObject riêng để tránh lỗi inactive
+        GameObject saveManagerObj = GameObject.Find("PlayerSaveManager");
+        if (saveManagerObj == null)
+        {
+            saveManagerObj = new GameObject("PlayerSaveManager");
+            DontDestroyOnLoad(saveManagerObj);
+            saveManager = saveManagerObj.AddComponent<PlayerSaveManager>();
+        }
+        else
+        {
+            saveManager = saveManagerObj.GetComponent<PlayerSaveManager>();
+        }
+        
+        // Link Player transform để lưu vị trí
+        if (saveManager != null)
+        {
+            // PlayerSaveManager sẽ tự lấy vị trí từ Player khi cần
+            Debug.Log("[Player] PlayerSaveManager đã được setup");
+        }
     }
 
     void Update() 

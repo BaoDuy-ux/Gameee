@@ -3,6 +3,7 @@ using System.Collections;
 
 /// <summary>
 /// Script quản lý quá trình phát triển của cây qua các giai đoạn
+/// Fixed: Removed duplicate GetCurrentStage method
 /// </summary>
 public class PlantGrowth : MonoBehaviour
 {
@@ -29,7 +30,14 @@ public class PlantGrowth : MonoBehaviour
         if (spriteRenderer == null)
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
-            spriteRenderer.sortingLayerName = "Tree";
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.sortingLayerName = "Tree";
+            }
+            else
+            {
+                Debug.LogWarning($"[PlantGrowth] {gameObject.name}: Không tìm thấy SpriteRenderer component!");
+            }
         }
     }
 
@@ -85,6 +93,14 @@ public class PlantGrowth : MonoBehaviour
             growthCoroutine = null;
         }
         isGrowing = false;
+    }
+    
+    /// <summary>
+    /// Lấy giai đoạn hiện tại
+    /// </summary>
+    public int GetCurrentStage()
+    {
+        return currentStage;
     }
 
     /// <summary>
@@ -162,14 +178,6 @@ public class PlantGrowth : MonoBehaviour
         {
             UpdateSprite();
         }
-    }
-
-    /// <summary>
-    /// Lấy giai đoạn hiện tại
-    /// </summary>
-    public int GetCurrentStage()
-    {
-        return currentStage;
     }
 
     /// <summary>

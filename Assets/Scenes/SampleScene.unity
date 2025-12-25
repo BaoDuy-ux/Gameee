@@ -1977,6 +1977,74 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 807123560}
   m_CullTransparentMesh: 1
+--- !u!1 &816252081
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 816252083}
+  - component: {fileID: 816252082}
+  - component: {fileID: 816252084}
+  m_Layer: 0
+  m_Name: ChatManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &816252082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 816252081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0053cc75ac31fe840a8ef00923292037, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chatPanel: {fileID: 0}
+  chatInputField: {fileID: 0}
+  sendButton: {fileID: 0}
+  chatScrollRect: {fileID: 0}
+  chatContent: {fileID: 0}
+  chatMessagePrefab: {fileID: 0}
+  onlineUsersText: {fileID: 0}
+  toggleChatButton: {fileID: 0}
+  refreshInterval: 2
+--- !u!4 &816252083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 816252081}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 960, y: -1620, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &816252084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 816252081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 683d1fe7cff439340b3645af1824c222, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoSetupOnStart: 1
+  hideChatPanelOnStart: 1
 --- !u!1 &841324556
 GameObject:
   m_ObjectHideFlags: 0
@@ -2321,7 +2389,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1002079719}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
@@ -2517,8 +2585,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f87311618b1eff64db0aabd7e2054914, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serverIP: 127.0.0.1
-  serverPort: 5000
+  serverURL: http://localhost:5000
 --- !u!4 &1160509975
 Transform:
   m_ObjectHideFlags: 0
@@ -2691,6 +2758,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1169279184}
   m_CullTransparentMesh: 1
+--- !u!1 &1179256921
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1179256923}
+  - component: {fileID: 1179256922}
+  m_Layer: 0
+  m_Name: Chat
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1179256922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1179256921}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63a2e31fd5e986c4dbb974e26d569661, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serverURL: http://localhost:5000
+  tcpManager: {fileID: 0}
+--- !u!4 &1179256923
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1179256921}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -18.34258, y: -10.889028, z: -10.203212}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1218537958
 GameObject:
   m_ObjectHideFlags: 0
@@ -5445,3 +5558,5 @@ SceneRoots:
   - {fileID: 1218537960}
   - {fileID: 1160509975}
   - {fileID: 1480042800}
+  - {fileID: 1179256923}
+  - {fileID: 816252083}

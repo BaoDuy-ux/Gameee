@@ -57,6 +57,7 @@ public class PlantableSpot : MonoBehaviour
             // Kiểm tra input để trồng cây
             if (Input.GetKeyDown(KeyCode.E))
             {
+                Debug.Log("[PlantableSpot] E key pressed, attempting to plant...");
                 if (useSeedSelectionUI && SeedSelectionUI.Instance != null)
                 {
                     // Mở UI chọn hạt giống
@@ -259,6 +260,8 @@ public class PlantableSpot : MonoBehaviour
         }
 
         Debug.Log($"[PlantableSpot] Planted {plantData.plantName} at {transform.position}");
+        
+        // Không lưu cây vào database (chỉ lưu vị trí player và hạt giống)
     }
 
     /// <summary>
@@ -273,16 +276,23 @@ public class PlantableSpot : MonoBehaviour
         }
         hasPlant = false;
     }
+    
+    // Đã xóa phần lưu cây vào database - chỉ lưu vị trí player và hạt giống
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
             playerInRange = true;
+            Debug.Log($"[PlantableSpot] Player entered range. HasPlant: {hasPlant}");
             if (!hasPlant)
             {
                 Debug.Log("[PlantableSpot] Press E to plant a seed here.");
             }
+        }
+        else
+        {
+            Debug.Log($"[PlantableSpot] OnTriggerEnter2D: {other.tag} (not Player)");
         }
     }
 
@@ -291,6 +301,7 @@ public class PlantableSpot : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
+            Debug.Log("[PlantableSpot] Player exited range.");
         }
     }
 
@@ -351,6 +362,23 @@ public class PlantableSpot : MonoBehaviour
     public GameObject GetCurrentPlant()
     {
         return currentPlant;
+    }
+    
+    /// <summary>
+    /// Set cây hiện tại (dùng khi load từ database)
+    /// </summary>
+    public void SetCurrentPlant(GameObject plant)
+    {
+        currentPlant = plant;
+        hasPlant = (plant != null);
+    }
+    
+    /// <summary>
+    /// Set trạng thái có cây (dùng khi load từ database)
+    /// </summary>
+    public void SetHasPlant(bool value)
+    {
+        hasPlant = value;
     }
 
     /// <summary>
