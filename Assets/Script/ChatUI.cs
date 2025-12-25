@@ -340,6 +340,9 @@ public class ChatUI : MonoBehaviour
         
         using (UnityEngine.Networking.UnityWebRequest request = UnityEngine.Networking.UnityWebRequest.Get(url))
         {
+            // Allow insecure HTTP connections (for local development)
+            request.certificateHandler = new BypassCertificateHandler();
+            
             yield return request.SendWebRequest();
             
             if (request.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
@@ -355,17 +358,28 @@ public class ChatUI : MonoBehaviour
     {
         try
         {
+            Debug.Log($"[ChatUI] Raw JSON response: {jsonResponse}");
+            
             // Parse JSON - Unity JsonUtility cần wrapper class
             var wrapper = JsonUtility.FromJson<ChatHistoryWrapper>(jsonResponse);
             
             if (wrapper.status == "success" && wrapper.messages != null)
             {
+                Debug.Log($"[ChatUI] Parsed {wrapper.messages.Length} messages");
+                
                 // Chỉ hiển thị tin nhắn mới (chưa hiển thị)
                 foreach (var msg in wrapper.messages)
                 {
                     if (!displayedMessageIds.Contains(msg.message_id))
                     {
-                        DisplayChatMessage(msg.sender_id, msg.username, msg.message_text);
+                        // Debug: Kiểm tra message_text
+                        string msgText = msg.GetMessageText();
+                        Debug.Log($"[ChatUI] Parsing message: message_id={msg.message_id}, sender_id={msg.sender_id}, username='{msg.username}', message_text='{msgText}'");
+                        
+                        // Kiểm tra nếu message_text null hoặc rỗng
+                        string messageToDisplay = string.IsNullOrEmpty(msgText) ? "(empty message)" : msgText;
+                        
+                        DisplayChatMessage(msg.sender_id, msg.username, messageToDisplay);
                         displayedMessageIds.Add(msg.message_id);
                         
                         if (msg.message_id > lastMessageId)
@@ -375,10 +389,15 @@ public class ChatUI : MonoBehaviour
                     }
                 }
             }
+            else
+            {
+                Debug.LogWarning($"[ChatUI] Status: {wrapper.status}, Messages: {(wrapper.messages == null ? "null" : "empty")}");
+            }
         }
         catch (System.Exception ex)
         {
             Debug.LogError("Lỗi parse chat: " + ex.Message);
+            Debug.LogError("Stack trace: " + ex.StackTrace);
             Debug.LogError("JSON: " + jsonResponse);
         }
     }
@@ -462,8 +481,12 @@ public class ChatMessage
     public int message_id;
     public int sender_id;
     public string username;
-    public string message_text;
+    // Backend trả về messageText (không có dấu gạch dưới) để Unity JsonUtility parse được
+    public string messageText;
     public string sent_at;
+    
+    // Property để lấy message text
+    public string GetMessageText() => messageText ?? "";
 }
 
 [System.Serializable]

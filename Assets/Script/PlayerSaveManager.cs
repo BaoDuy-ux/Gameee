@@ -148,6 +148,9 @@ public class PlayerSaveManager : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
         
+        // Allow insecure HTTP connections (for local development)
+        request.certificateHandler = new BypassCertificateHandler();
+        
         yield return request.SendWebRequest();
         
         Debug.Log($"[PlayerSaveManager] SavePosition - URL: {url}");
@@ -179,6 +182,9 @@ public class PlayerSaveManager : MonoBehaviour
         
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
+            // Allow insecure HTTP connections (for local development)
+            request.certificateHandler = new BypassCertificateHandler();
+            
             yield return request.SendWebRequest();
             
             if (request.result == UnityWebRequest.Result.Success)
@@ -254,6 +260,9 @@ public class PlayerSaveManager : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
+        
+        // Allow insecure HTTP connections (for local development)
+        request.certificateHandler = new BypassCertificateHandler();
         
         yield return request.SendWebRequest();
         

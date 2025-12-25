@@ -24,6 +24,13 @@ public class SignalRManager : MonoBehaviour
             tcpManager = FindFirstObjectByType<TcpClientManager>();
         }
         
+        // Đồng bộ serverURL từ TcpClientManager nếu có
+        if (tcpManager != null && !string.IsNullOrEmpty(tcpManager.serverURL))
+        {
+            serverURL = tcpManager.serverURL;
+            Debug.Log($"[SignalRManager] Đã đồng bộ serverURL từ TcpClientManager: {serverURL}");
+        }
+        
         // Lấy userId từ PlayerPrefs sau khi đăng nhập
         if (PlayerPrefs.HasKey("UserId"))
         {
@@ -92,6 +99,9 @@ public class SignalRManager : MonoBehaviour
         request.downloadHandler = new UnityEngine.Networking.DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
         
+        // Allow insecure HTTP connections (for local development)
+        request.certificateHandler = new BypassCertificateHandler();
+        
         yield return request.SendWebRequest();
         
         Debug.Log($"[SignalRManager] Response Code: {request.responseCode}");
@@ -123,6 +133,9 @@ public class SignalRManager : MonoBehaviour
         
         using (UnityEngine.Networking.UnityWebRequest request = UnityEngine.Networking.UnityWebRequest.Get(url))
         {
+            // Allow insecure HTTP connections (for local development)
+            request.certificateHandler = new BypassCertificateHandler();
+            
             yield return request.SendWebRequest();
             
             if (request.result == UnityEngine.Networking.UnityWebRequest.Result.Success)

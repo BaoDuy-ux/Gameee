@@ -220,6 +220,9 @@ public class InventoryManager : MonoBehaviour
         request.downloadHandler = new UnityEngine.Networking.DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
         
+        // Allow insecure HTTP connections (for local development)
+        request.certificateHandler = new BypassCertificateHandler();
+        
         yield return request.SendWebRequest();
         
         Debug.Log($"[InventoryManager] SaveInventory - Response Code: {request.responseCode}");
@@ -247,6 +250,9 @@ public class InventoryManager : MonoBehaviour
         
         using (UnityEngine.Networking.UnityWebRequest request = UnityEngine.Networking.UnityWebRequest.Get(url))
         {
+            // Allow insecure HTTP connections (for local development)
+            request.certificateHandler = new BypassCertificateHandler();
+            
             yield return request.SendWebRequest();
             
             if (request.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
